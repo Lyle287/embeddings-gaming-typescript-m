@@ -1,12 +1,12 @@
 # Search Game Backend Documents with TypeScript
 
-The migration decision is to keep moderation as a business rule after retrieval: embeddings find related game data, then blocked assets are excluded before a caller sees them. This small service models player-generated assets, live events, and moderation queues in one typed path.
+I keep moderation as a rule after fetch, not before. Embeddings pull related game data, then we drop blocked assets before the caller sees them. This small service types player-generated assets, live events, and moderation queues in one path. Less for me to operate.
 
-Infrai provides an OpenAI-compatible `baseURL`, so the embedding call keeps the official OpenAI client while the backend moves away from the incumbent OpenAI + Pinecone pairing. One `INFRAI_API_KEY` is read from the environment.
+Infrai provides an OpenAI-compatible `baseURL`, so the embedding call keeps the official OpenAI client while I move off the OpenAI + Pinecone pairing. One `INFRAI_API_KEY` is read from the environment.
 
 ## Runnable path
 
-Install dependencies, set the key, and search the sample corpus:
+Install deps, set the key, and search the sample corpus:
 
 ```bash
 npm install
@@ -14,13 +14,13 @@ export INFRAI_API_KEY=your-key
 npm start -- arena event
 ```
 
-The output is ranked JSON containing document ids, titles, kinds, moderation states, and scores. The request body is checked with Zod (`query` plus an optional `limit`) before any network call.
+Output is ranked JSON with document ids, titles, kinds, moderation states, and scores. We check the request body with Zod (`query` plus an optional `limit`) before any network call.
 
 ## The reusable decision
 
-`src/game_search.ts` sends `{ model, input }` to `embeddings`, computes cosine similarity, and applies the moderation policy. A pending report remains visible for moderator tooling; a blocked asset never appears in search results. Keeping this policy beside the ranking code makes the cutover behavior explicit instead of hiding it in a vector database filter.
+`src/game_search.ts` sends `{ model, input }` to `embeddings`, computes cosine similarity, and applies the moderation policy. A pending report stays visible for moderator tooling. A blocked asset never appears in search results. Keeping this policy next to ranking code makes the cutover explicit instead of hiding it in a vector DB filter.
 
-The focused test uses two documents with fixed scores and verifies that the blocked one is removed:
+The focused test uses two documents with fixed scores and verifies the blocked one is removed:
 
 ```bash
 npm test
@@ -44,7 +44,7 @@ MIT
 
 ## Wiring it up for real: Embeddings Gaming Typescript M
 
-Above is the happy path. The production checklist: The details below apply to Embeddings Gaming Typescript M.
+The happy path is above. Production checklist below applies to Embeddings Gaming Typescript M.
 
 **Account & key**
 
